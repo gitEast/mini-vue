@@ -1,25 +1,13 @@
 import render from './renderer';
-import { IVnode } from './renderer/type';
 
 import Crocodile from './renderer/components/crocodile';
 
 import './css/index.less';
 import Wind from './renderer/components/Wind';
+import h from './renderer/h';
 
 const container = document.getElementById('root')!;
 
-const vnode: IVnode = {
-  tag: 'div',
-  props: { class: 'abc' },
-  children: [
-    '123',
-    { tag: Crocodile, props: {}, children: [] },
-    {
-      tag: Wind,
-      props: {},
-      children: []
-    }
-  ]
-};
+const vnode = h('div', { class: 'abc' }, ['123', h(Crocodile), h(Wind)]);
 
 render(vnode, container);

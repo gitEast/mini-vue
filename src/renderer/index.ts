@@ -1,9 +1,18 @@
-import { IVnode } from './type';
+import { IComponentVnode, IHTMLVnode, IVnode } from './type';
 
 /**
  * 渲染函数
  */
 function render(vnode: IVnode, container: HTMLElement) {
+  if (typeof vnode.tag === 'string') {
+    mountElement(vnode as IHTMLVnode, container);
+  } else mountComponent(vnode as IComponentVnode, container);
+}
+
+/**
+ * 挂载 HTML 标签
+ */
+function mountElement(vnode: IHTMLVnode, container: HTMLElement) {
   // 1. tag
   const el = document.createElement(vnode.tag as keyof HTMLElementTagNameMap);
   container.appendChild(el);
@@ -21,17 +30,19 @@ function render(vnode: IVnode, container: HTMLElement) {
   // 3. children
   for (const child of vnode.children) {
     if (typeof child === 'string') {
-      const childNode = document.createTextNode(child);
-      el.appendChild(childNode);
-    } else if (typeof child === 'object') {
-      if (typeof child.tag === 'function') {
-        render(child.tag(), el);
-      } else if (typeof child.tag === 'object') {
-        render(child.tag.render(), el);
-      } else {
-        render(child, el);
-      }
-    }
+      el.appendChild(document.createTextNode(child));
+    } else render(child, el);
+  }
+}
+
+/**
+ * 挂载组件
+ */
+function mountComponent(vnode: IComponentVnode, container: HTMLElement) {
+  if (typeof vnode.tag === 'function') {
+    render(vnode.tag(), container);
+  } else {
+    render(vnode.tag.render(), container);
   }
 }
 
