@@ -1,3 +1,7 @@
+/**
+ * renderer 渲染器的测试代码
+ */
+
 import render from './renderer';
 
 import Crocodile from './renderer/components/crocodile';
