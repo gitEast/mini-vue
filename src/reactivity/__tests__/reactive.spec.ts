@@ -14,4 +14,10 @@ describe('reactivity/reactive', () => {
     observed.age = 25;
     expect(observed.age).toBe(25);
   });
+
+  it('self-incrementing', () => {
+    const info = reactive({ age: 24 });
+    info.age++;
+    expect(info.age).toBe(25);
+  });
 });
