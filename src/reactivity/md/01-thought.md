@@ -136,8 +136,8 @@ it('effect', () => {
 
   // 观测的值
   let momAge: number = 0;
-  // 以 vi.fn 包裹函数，能监测到其是否被调用与调用的次数
-  const getMomAge = vi.fn(() => {
+  // 以 jest.fn 包裹函数，能监测到其是否被调用与调用的次数
+  const getMomAge = jest.fn(() => {
     momAge = info.age + 20;
   });
 

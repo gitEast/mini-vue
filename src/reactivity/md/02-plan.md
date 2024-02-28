@@ -27,7 +27,7 @@ it('self-incrementing', () => {
 // 在函数内部的自增操作
 it('self-incrementing in effect', () => {
   const info = reactive({ age: 24 });
-  const yearPass = vi.fn(() => {
+  const yearPass = jest.fn(() => {
     info.age++;
   });
   effect(yearPass);
@@ -99,9 +99,9 @@ it('should allow nested effects', () => {
   const dummy: any = {};
 
   // 内部嵌套的函数
-  const childSpy = vi.fn(() => (dummy.num1 = nums.num1));
+  const childSpy = jest.fn(() => (dummy.num1 = nums.num1));
   // 外部函数
-  const parentSpy = vi.fn(() => {
+  const parentSpy = jest.fn(() => {
     dummy.num2 = nums.num2;
     effect(childSpy);
     dummy.num3 = nums.num3;
@@ -207,7 +207,7 @@ export function trigger(target: object, key: unknown) {
 it('分支情况下不必要的更新', () => {
   let isShow = true;
   const info = reactive({ age: 24 });
-  const getAge = vi.fn(() => (isShow ? info.age : '?'));
+  const getAge = jest.fn(() => (isShow ? info.age : '?'));
   effect(getAge);
 
   expect(getAge).toHaveBeenCalledTimes(1);

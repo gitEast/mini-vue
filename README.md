@@ -30,6 +30,14 @@
        "types": ["vitest/globals"]
      }
      ```
+5. vitest 使用出现问题，改为使用 jest
+   1. `npm install --save-dev jest`
+   2. `npm install --save-dev babel-jest @babel/core @babel/preset-env`
+   3. `npm install --save-dev @babel/preset-typescript`
+   4. `npm install --save-dev @types/jest`
+   5. 新建 `babel.config.js`，具体配置见该文件
+   6. 修改 `tsconfig.json` 配置 `"types": [ "jest" ]`
+   7. 修改 `package.json` 脚本 `"test": "jest"`
 
 ## 一、响应系统
 

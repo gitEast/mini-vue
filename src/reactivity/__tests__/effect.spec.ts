@@ -10,8 +10,8 @@ describe('reactivity/effect', () => {
 
     // 观测的值
     let momAge: number = 0;
-    // 以 vi.fn 包裹函数，能监测到其是否被调用与调用的次数
-    const getMomAge = vi.fn(() => {
+    // 以 jest.fn 包裹函数，能监测到其是否被调用与调用的次数
+    const getMomAge = jest.fn(() => {
       momAge = info.age + 20;
     });
 
@@ -26,7 +26,7 @@ describe('reactivity/effect', () => {
 
   it('self-incrementing in effect', () => {
     const info = reactive({ age: 24 });
-    const yearPass = vi.fn(() => {
+    const yearPass = jest.fn(() => {
       info.age++;
     });
     effect(yearPass);
@@ -40,9 +40,9 @@ describe('reactivity/effect', () => {
     const dummy: any = {};
 
     // 内部嵌套的函数
-    const childSpy = vi.fn(() => (dummy.num1 = nums.num1));
+    const childSpy = jest.fn(() => (dummy.num1 = nums.num1));
     // 外部函数
-    const parentSpy = vi.fn(() => {
+    const parentSpy = jest.fn(() => {
       dummy.num2 = nums.num2;
       effect(childSpy);
       dummy.num3 = nums.num3;
@@ -72,7 +72,7 @@ describe('reactivity/effect', () => {
   it('分支情况下不必要的更新', () => {
     let isShow = true;
     const info = reactive({ age: 24 });
-    const getAge = vi.fn(() => {
+    const getAge = jest.fn(() => {
       isShow ? info.age : '?';
     });
     effect(getAge);
@@ -91,5 +91,56 @@ describe('reactivity/effect', () => {
     // getAge 没有被调用
     info.age++;
     expect(getAge).toHaveBeenCalledTimes(3);
+  });
+
+  it('key in obj', () => {
+    const proto = { species: 'human' };
+    const obj = { age: 24 };
+    const parent = reactive(proto);
+    const child = reactive(obj);
+    Reflect.setPrototypeOf(child, parent);
+    const keyAge = jest.fn(() => {
+      if ('age' in child) {
+        console.log('age in obj √');
+      } else {
+        console.log('age in obj ×');
+      }
+    });
+    const keySpecies = jest.fn(() => {
+      if ('species' in child) {
+        console.log('species in obj √');
+      } else {
+        console.log('species in obj ×');
+      }
+    });
+    effect(keyAge);
+    effect(keySpecies);
+
+    // 删除 child.age，keyAge 需被再次调用
+    delete (child as any).age;
+    expect(keyAge).toHaveBeenCalledTimes(2);
+    // 删除 parent.age，keyAge 需被再次调用
+    delete (parent as any).species;
+    expect(keySpecies).toHaveBeenCalledTimes(2);
+  });
+
+  it('for...in...', () => {
+    const original = { name: 'Crocodile', age: 24, species: 'human' };
+    const observed = reactive(original);
+    const traverse = jest.fn(() => {
+      const keys = [];
+      for (const key in observed) {
+        keys.push(key);
+      }
+      console.log(keys.toString());
+    });
+    effect(traverse);
+    expect(traverse).toHaveBeenCalledTimes(1);
+    delete (observed as any).species;
+    expect(traverse).toHaveBeenCalledTimes(2);
+    observed.species = 'human being';
+    expect(traverse).toHaveBeenCalledTimes(3);
+    observed.species = 'human';
+    expect(traverse).toHaveBeenCalledTimes(3);
   });
 });
